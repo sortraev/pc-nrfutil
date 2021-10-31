@@ -1,3 +1,13 @@
+# About this fork
+
+This is a modified version of Nordic's nrfutil. This fork introduces support for OTA flashing bluetooth devices using regular a bluetooth dongle (Linux only).
+
+Usage:
+
+    dfu ble-native -pkg update.zip  -a 11:22:33:44:55:66
+
+Below is a copy of original README
+
 # nRF Util
 
 [![Latest version](https://img.shields.io/pypi/v/nrfutil.svg)](https://pypi.python.org/pypi/nrfutil)
