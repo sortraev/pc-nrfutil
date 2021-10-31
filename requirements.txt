@@ -1,4 +1,5 @@
 antlib >= 1.1b0; sys_platform == 'win32'
+BLE_GATT
 click
 crcmod
 ecdsa

@@ -1208,6 +1208,36 @@ def ble(package, conn_ic_id, port, connect_delay, name, address, jlink_snr, flas
 
     click.echo("Device programmed.")
 
+@dfu.command(short_help="Update the firmware on a device over a BLE connection using a regluar BT adapter.")
+@click.option('-pkg', '--package',
+              help='Filename of the DFU package.',
+              type=click.Path(exists=True, resolve_path=True, file_okay=True, dir_okay=False),
+              required=True)
+@click.option('-a', '--address',
+              help='BLE address of the DFU target device.',
+              type=click.STRING)
+def ble_native(package, address):
+    """
+    Perform a Device Firmware Update on a device with a bootloader that supports BLE DFU.
+    This requires a regular BT adapter recognized by the OS.
+    """
+    from nordicsemi.dfu.dfu_transport_ble_native import DfuTransportBleNative
+
+    ble_backend = DfuTransportBleNative(
+                                  target_device_addr=str(address))
+    ble_backend.register_events_callback(DfuEvent.PROGRESS_EVENT, update_progress)
+    dfu = Dfu(zip_file_path=package, dfu_transport=ble_backend, connect_delay=1)
+
+    if logger.getEffectiveLevel() > logging.INFO:
+        with click.progressbar(length=dfu.dfu_get_total_size()) as bar:
+            global global_bar
+            global_bar = bar
+            dfu.dfu_send_images()
+    else:
+        dfu.dfu_send_images()
+
+    click.echo("Device programmed.")
+
 
 @dfu.command(short_help="Update the firmware on a device over an ANT connection.")
 @click.option('-pkg', '--package',
