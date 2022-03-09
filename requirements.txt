@@ -5,7 +5,7 @@ crcmod
 ecdsa
 intelhex
 libusb1
-pc_ble_driver_py >= 0.16.1
+pc_ble_driver_py
 piccata
 protobuf
 pyserial
