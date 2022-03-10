@@ -25,36 +25,25 @@ class DfuModeJumper():
                              f"{type(p).__name__}.")
         self.p = p
 
-        try:
-            self.buttonless_char        = self.p.getCharacteristics(uuid = DfuModeJumper.BUTTONLESS_UUID)[0]
-            self.buttonless_char_handle = self.buttonless_char.getHandle()
-            logging.info("Got buttonless characteristic and handle.")
+        self.buttonless_char        = self.p.getCharacteristics(uuid = DfuModeJumper.BUTTONLESS_UUID)[0]
+        self.buttonless_char_handle = self.buttonless_char.getHandle()
+        logging.info("Got buttonless characteristic and handle.")
 
-            cccd_handle = self.buttonless_char_handle + 1
-            res = self.p.writeCharacteristic(cccd_handle, b"\x02\x00", withResponse = True)
-            logging.info("Subscribed to indications for buttonless characteristic "
-                         f"with response: {res}.")
-
-        except Exception as e:
-            self.p.disconnect()
-            raise e
+        cccd_handle = self.buttonless_char_handle + 1
+        res = self.p.writeCharacteristic(cccd_handle, b"\x02\x00", withResponse = True)
+        logging.info("Subscribed to indications for buttonless characteristic "
+                     f"with response: {res}.")
 
     def jump_to_dfu_mode(self):
-        try:
-            res = self.p.writeCharacteristic(self.buttonless_char_handle,
-                                             b"\x01",
-                                             withResponse = True)
-            logging.info("Successfully wrote to buttonless characteristic with"
-                         f" response: {res}")
-            self.p.disconnect() # TODO: ??
-
-        except Exception as e:
-            self.p.disconnect()
-            raise e
-
-        #  time.sleep(4) # TODO: do we need to enforce a sleep here? if so, is
+        res = self.p.writeCharacteristic(self.buttonless_char_handle,
+                                         b"\x01",
+                                         withResponse = True)
+        logging.info("Successfully wrote to buttonless characteristic with"
+                     f" response: {res}")
+        time.sleep(4) # TODO: do we need to enforce a sleep here? if so, is
                       #       there an official recommendation on how long?
-        #  return self.__is_properly_disconnected()
+
+        #  return self.is_properly_disconnected()
 
     def is_properly_disconnected(self):
         """
@@ -82,7 +71,7 @@ class DfuModeJumper():
             return "helper exited" in e_msg or "helper not started" in e_msg
 
         except Exception as e:
-            logging.info(f"Unexpected exception during disconnection check: {e}")
+            logging.info(f"Unexpected exception during disconnection check: {type(e).__name__}: {e}")
             return False
 
     def get_bootloader_addr(self):
